@@ -2,6 +2,11 @@
 A Python-based bot that searches, downloads, and uploads videos from social media platforms.
 
 
+## Run The Project
+pip install -r requirements.txt
+
+python main.py
+
 ## Creating env
 cd into directory
 
@@ -12,5 +17,3 @@ python -m venv venv
 LINUX/MAC  
 python -m venv myenv  
 source myenv/bin/activate
-
-## Run The Project
