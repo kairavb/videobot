@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+from time import sleep
 
 # Access constants from config file
 # ----------------------------------
@@ -10,6 +11,8 @@ with open('config.json', 'r') as file:
 TOKEN = config_data.get('TOKEN')
 UPLOAD_URL_ENDPOINT = config_data.get('UPLOAD_URL_ENDPOINT')
 CREATE_POST_ENDPOINT = config_data.get('CREATE_POST_ENDPOINT')
+VIDEO_DIR = config_data.get('VIDEO_DIR')  # Directory to monitor
+PROCESSED_FILES = set()  # Keep track of already processed files
 # ----------------------------------
 
 
@@ -27,7 +30,6 @@ def get_upload_url():
     response = requests.get(UPLOAD_URL_ENDPOINT, headers=HEADERS)
     if response.status_code == 200:
         data = response.json()
-        print("Got Upload url")
         return data["url"], data["hash"]
     else:
         print(f"Failed to get upload URL: {response.status_code} - {response.text}")
@@ -39,7 +41,6 @@ def upload_video(file_path, upload_url):
     with open(file_path, "rb") as file:
         response = requests.put(upload_url, data=file)
         if response.status_code == 200:
-            print(f"Video uploaded successfully: {file_path}")
             return True
         else:
             print(f"Failed to upload video: {response.status_code} - {response.text}")
@@ -56,17 +57,42 @@ def create_post(title, video_hash, category_id):
     }
     response = requests.post(CREATE_POST_ENDPOINT, headers=HEADERS, json=payload)
     if response.status_code == 200:
-        print(f"Post created successfully: {title}")
         return True
     else:
         print(f"Failed to create post: {response.status_code} - {response.text}")
         return False
 
 
-def main():
-    video_path = "./videos/vid.mp4"  # Path to video file
-    video_title = "test50"  # Video title
-    category_id = "Super Feed"  # Code 25 for super feed
+def monitor_directory():
+    """Monitor the /videos directory for new .mp4 files."""
+    global PROCESSED_FILES
+
+    print(f"Monitoring {VIDEO_DIR} for new .mp4 files...")
+    while True:
+        # Get list of all .mp4 files in the directory
+        current_files = {file for file in os.listdir(VIDEO_DIR) if file.endswith('.mp4')}
+        
+        # Identify new files by subtracting already processed files
+        new_files = current_files - PROCESSED_FILES
+        
+        # Process new files
+        for file in new_files:
+            file_path = os.path.join(VIDEO_DIR, file)
+            print(f"New file detected: {file_path}")
+            handle_new_file(file_path)  # Call your video processing logic here
+
+        # Update the processed files set
+        PROCESSED_FILES = current_files
+        
+        # Sleep for a short period to avoid busy-waiting
+        # Checks for every 5 seconds
+        sleep(5)
+
+
+def handle_new_file(file_path):
+    video_path = f"{file_path}"  # Path to video file
+    video_title = "test"  # Video title
+    category_id = "25"  # Code 25 for super feed
 
     # Step 1: Fetch upload URL
     upload_url, video_hash = get_upload_url()
@@ -87,7 +113,7 @@ def main():
     # Removes file after upload
     os.remove(video_path)
 
-    print("Process completed successfully!")
+    print("Uploaded successfully!")
 
 
-main()
+monitor_directory()
