@@ -3,6 +3,8 @@ A Python-based bot that searches, downloads, and uploads videos from social medi
 
 
 ## Run The Project
+git clone and cd into project then,
+
 ```bash
 pip install -r requirements.txt
 
