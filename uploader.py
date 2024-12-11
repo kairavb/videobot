@@ -1,13 +1,16 @@
+# for calling api
 import requests
+
+# for importing config
 import json
+
+# for handeling files
 import os
+
+# for waiting until next check
 from time import sleep
 
-# For downloafing instagram reels
-import instaloader
 
-# For downloading TikTok reels
-from tiktok_downloader import snaptik
 
 # Access constants from config file
 # ----------------------------------
@@ -90,7 +93,7 @@ def monitor_directory():
         for file in new_files:
             file_path = os.path.join(VIDEO_DIR, file)
             print(f"New file detected: {file_path}")
-            handle_new_file(file_path)  # Call your video processing logic here
+            handle_new_file(file_path)
 
         # Update the processed files set
         PROCESSED_FILES = current_files
@@ -103,9 +106,9 @@ def monitor_directory():
 
 # Handle a new file discoverd by monitor
 # ----------------------------------
-def handle_new_file(file_path):
+def handle_new_file(file_path, title="test"):
     video_path = f"{file_path}"  # Path to video file
-    video_title = "ktest"  # Video title
+    video_title = title  # Video title
     category_id = "25"  # Code 25 for super feed
 
     # Step 1: Fetch upload URL
@@ -129,87 +132,3 @@ def handle_new_file(file_path):
 
     print("Uploaded successfully!")
 # ----------------------------------
-
-
-# Download videos from instagram and tiktok with given url's
-# ----------------------------------
-def download_video(video_url, file_path):
-    response = requests.get(video_url, stream=True)
-    with open(file_path, 'wb') as file:
-        for chunk in response.iter_content(chunk_size=1024):
-            file.write(chunk)
-
-
-def download_instagram_reel(url, save_dir="videos"):
-    """
-    Download an Instagram Reel with sound from the given URL.
-    """
-    L = instaloader.Instaloader()
-    os.makedirs(save_dir, exist_ok=True)
-    try:
-        # Extract shortcode and fetch the post metadata
-        shortcode = url.split("/")[-2]
-        post = instaloader.Post.from_shortcode(L.context, shortcode)
-        
-        # Get the direct video URL
-        video_url = post.video_url
-        file_path = os.path.join(save_dir, f"{shortcode}.mp4")
-        
-        # Download the video with sound
-        response = requests.get(video_url, stream=True)
-        with open(file_path, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=1024):
-                file.write(chunk)
-        
-        print(f"Instagram Reel downloaded with sound to: {file_path}")
-        return file_path
-
-    except Exception as e:
-        print(f"Error downloading Instagram Reel: {e}")
-        return None
-
-
-def download_tiktok_video(url, save_dir="videos"):
-    """
-    Download an TikToks with sound from the given URL.
-    """
-    try:
-        data = snaptik(url)
-        video_url = data["download_links"][0]
-        os.makedirs(save_dir, exist_ok=True)
-        file_path = os.path.join(save_dir, f"tiktok_{url.split('/')[-1]}.mp4")
-        download_video(video_url, file_path)
-        return file_path
-    except:
-        return None
-
-def download_video_by_url(url):
-    if "instagram.com" in url:
-        return download_instagram_reel(url)
-    elif "tiktok.com" in url:
-        return download_tiktok_video(url)
-    else:
-        return None
-# ----------------------------------
-
-
-# Main function
-# ----------------------------------
-def main(links):
-    for url in links:
-        result = download_video_by_url(url)
-        print(f"Downloaded to: {result}" if result else "Download failed.")
-    monitor_directory()
-# ----------------------------------
-
-
-# Store links the way you wanted
-# Sample links
-links = [
-    "https://www.instagram.com/reels/C_Lahgkt2sh/",
-    "https://www.instagram.com/reels/DBJpTjko4eI/",
-    "https://www.instagram.com/reels/DBRo1Mooo6E/"
-]
-
-if __name__ == "__main__":
-    main(links)
