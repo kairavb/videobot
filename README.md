@@ -25,6 +25,7 @@ example config file in root directory
     "TOKEN": "your_token",
     "UPLOAD_URL_ENDPOINT": "https://api.socialverseapp.com/posts/generate-upload-url",
     "CREATE_POST_ENDPOINT": "https://api.socialverseapp.com/posts",
-    "VIDEO_DIR": "./videos"
+    "VIDEO_DIR": "./videos",
+    "CATEGORY_ID": "null"
 }
 ```

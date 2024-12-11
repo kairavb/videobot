@@ -1,13 +1,20 @@
+# for concurrent uploads
 import asyncio
+
+# importing uploader file
 import uploader
+
+# importing downloader file
 import downloader
+
+# for progress bar
+from tqdm import tqdm
 
 # Main function
 # ----------------------------------
 async def main(links):
     # Download videos
-    print("Downloading videos")
-    for url in links:
+    for url in tqdm(links, desc="Downloading Videos", unit="video", leave=False):
         downloader.download_video_by_url(url)
     
     # Monitor directory for uploads

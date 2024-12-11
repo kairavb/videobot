@@ -1,8 +1,15 @@
+# for file handeling
 import os
+
+# for progress bar
+from tqdm import tqdm
+
+# for concurrent uploads
 import aiohttp
 import asyncio
+
+# for importing config
 import json
-from time import sleep
 
 # Access constants from config file
 # ----------------------------------
@@ -14,6 +21,7 @@ UPLOAD_URL_ENDPOINT = config_data.get('UPLOAD_URL_ENDPOINT')
 CREATE_POST_ENDPOINT = config_data.get('CREATE_POST_ENDPOINT')
 VIDEO_DIR = config_data.get('VIDEO_DIR')  # Directory to monitor
 PROCESSED_FILES = set()  # Keep track of already processed files
+CATEGORY_ID = config_data.get('CATEGORY_ID')
 # ----------------------------------
 
 # Set up Headers
@@ -71,7 +79,7 @@ async def handle_new_file(file_path, title="test"):
     """Asynchronously handle a newly discovered file."""
     video_path = file_path
     video_title = title
-    category_id = "25"  # Code 25 for super feed
+    category_id = CATEGORY_ID  # Code 25 for super feed
 
     # Step 1: Fetch upload URL
     upload_url, video_hash = await get_upload_url()
@@ -99,14 +107,19 @@ async def monitor_directory():
     global PROCESSED_FILES
 
     while True:
-        print(f"Monitoring {VIDEO_DIR} for new .mp4 files...")
         current_files = {file for file in os.listdir(VIDEO_DIR) if file.endswith('.mp4')}
         new_files = current_files - PROCESSED_FILES
 
         if new_files:
-            print(f"New files detected: {new_files}")
-            tasks = [handle_new_file(os.path.join(VIDEO_DIR, file)) for file in new_files]
-            await asyncio.gather(*tasks)
+            # print(f"New files detected: {new_files}")
+            # Display a progress bar for processing new files
+            async for _ in tqdm.asyncio.as_completed(
+                [handle_new_file(os.path.join(VIDEO_DIR, file)) for file in new_files],
+                desc="Uploading videos concurrently",
+                unit="file",
+                total=len(new_files),
+            ):
+                pass
 
             PROCESSED_FILES = current_files
 
