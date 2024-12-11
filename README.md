@@ -3,13 +3,16 @@ A Python-based bot that searches, downloads, and uploads videos from social medi
 
 
 ## Run The Project
+```bash
 pip install -r requirements.txt
 
 python main.py
+```
 
 ## Creating env
 cd into directory
 
+```bash
 WINDOWS  
 python -m venv venv  
 .\venv\Scripts\activate
@@ -17,6 +20,7 @@ python -m venv venv
 LINUX/MAC  
 python -m venv myenv  
 source myenv/bin/activate
+```
 
 ## Config.json
 example config file in root directory
