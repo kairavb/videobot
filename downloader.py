@@ -36,8 +36,7 @@ def download_instagram_reel(url, save_dir="videos"):
         with open(file_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=1024):
                 file.write(chunk)
-        
-        print(f"Instagram Reel downloaded with sound to: {file_path}")
+
         return file_path
 
     except Exception as e:

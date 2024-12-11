@@ -1,14 +1,17 @@
+import asyncio
 import uploader
 import downloader
 
-
 # Main function
 # ----------------------------------
-def main(links):
+async def main(links):
+    # Download videos
+    print("Downloading videos")
     for url in links:
-        result = downloader.download_video_by_url(url)
-        print(f"Downloaded to: {result}" if result else "Download failed.")
-    uploader.monitor_directory()
+        downloader.download_video_by_url(url)
+    
+    # Monitor directory for uploads
+    await uploader.monitor_directory()
 # ----------------------------------
 
 # Store links the way you wanted
@@ -20,4 +23,4 @@ links = [
 ]
 
 if __name__ == "__main__":
-    main(links)
+    asyncio.run(main(links))
