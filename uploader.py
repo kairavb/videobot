@@ -110,16 +110,22 @@ async def monitor_directory():
         current_files = {file for file in os.listdir(VIDEO_DIR) if file.endswith('.mp4')}
         new_files = current_files - PROCESSED_FILES
 
+        print(f"Monitoring {VIDEO_DIR} for new .mp4 files...")
         if new_files:
-            # print(f"New files detected: {new_files}")
-            # Display a progress bar for processing new files
-            async for _ in tqdm.asyncio.as_completed(
-                [handle_new_file(os.path.join(VIDEO_DIR, file)) for file in new_files],
-                desc="Uploading videos concurrently",
-                unit="file",
-                total=len(new_files),
-            ):
-                pass
+
+            # Create a progress bar for processing new files
+            with tqdm(total=len(new_files), desc="Uploading files concurrently", unit="file") as pbar:
+                tasks = []
+                for file in new_files:
+                    # Create a task for each file processing
+                    task = asyncio.create_task(handle_new_file(os.path.join(VIDEO_DIR, file)))
+                    
+                    # Add a callback to update the progress bar when the task is done
+                    task.add_done_callback(lambda _: pbar.update(1))  # Update progress bar on task completion
+                    tasks.append(task)
+
+                # Wait for all tasks to complete
+                await asyncio.gather(*tasks)
 
             PROCESSED_FILES = current_files
 
