@@ -17,3 +17,14 @@ python -m venv venv
 LINUX/MAC  
 python -m venv myenv  
 source myenv/bin/activate
+
+## Config.json
+example config file in root directory
+```json
+{
+    "TOKEN": "your_token",
+    "UPLOAD_URL_ENDPOINT": "https://api.socialverseapp.com/posts/generate-upload-url",
+    "CREATE_POST_ENDPOINT": "https://api.socialverseapp.com/posts",
+    "VIDEO_DIR": "./videos"
+}
+```
