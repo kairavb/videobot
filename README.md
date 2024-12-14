@@ -1,6 +1,10 @@
 # videobot
 A Python-based bot that searches, downloads, and uploads videos from social media platforms.
 
+Self-introduction
+Project setup instructions
+Code walkthrough
+output
 
 ## Run The Project
 git clone and cd into project then,

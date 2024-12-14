@@ -1,5 +1,7 @@
 /myenv
 /videos
 /__pycache__
+/images
 
+genconfig.json
 config.json
